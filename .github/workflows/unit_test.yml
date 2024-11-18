@@ -1,0 +1,33 @@
+name: Unit Test
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+
+    env:
+      WEATHER_API_KEY: ${{secrets.WEATHER_API_KEY}}
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v3.13.0
+        with:
+          java-version: 11
+          distribution: 'zulu'
+
+      - name: Grant execute permissions for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Run Tests
+        run: ./gradlew test
+
+        #- name: Lint
+        #run: ./gradlew lint
+
