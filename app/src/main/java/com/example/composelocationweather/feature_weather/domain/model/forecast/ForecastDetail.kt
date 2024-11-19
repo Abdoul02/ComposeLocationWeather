@@ -6,7 +6,7 @@ data class ForecastDetail(
     val dt_txt: String,
     val main: ForecastMain,
     val rain: Rain?,
-    val sys: ForecastSys,
+    val sys: ForecastSys? = null,
     val weather: List<ForecastWeather>,
-    val wind: ForecastWind
+    val wind: ForecastWind?
 )
