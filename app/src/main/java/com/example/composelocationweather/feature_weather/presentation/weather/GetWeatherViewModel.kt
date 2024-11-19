@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.composelocationweather.feature_weather.domain.model.WeatherRequestData
 import com.example.composelocationweather.feature_weather.domain.model.currentWeather.CurrentWeatherModel
 import com.example.composelocationweather.feature_weather.domain.use_case.WeatherUseCase
+import com.example.composelocationweather.feature_weather.presentation.state.CurrentWeatherState
 import com.example.composelocationweather.location.AppLocationProvider
 import com.example.composelocationweather.util.Status
 import dagger.hilt.android.lifecycle.HiltViewModel
