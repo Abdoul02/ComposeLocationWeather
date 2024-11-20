@@ -44,8 +44,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.example.composelocationweather.feature_weather.presentation.weather.GetWeatherViewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.composelocationweather.feature_weather.presentation.GetWeatherViewModel
+import com.example.composelocationweather.feature_weather.presentation.WeatherInfoScreen
 import com.example.composelocationweather.ui.theme.ComposeLocationWeatherTheme
+import com.example.composelocationweather.util.Screen
+import com.example.composelocationweather.util.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -56,6 +62,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val getWeatherViewModel: GetWeatherViewModel = hiltViewModel()
+            val utils = Utils(this.applicationContext)
             val locationPermissions = arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION
@@ -140,25 +147,40 @@ class MainActivity : ComponentActivity() {
                         ) {
 
                             if (areLocationPermissionsAlreadyGranted()) {
-                                val currentWeatherState = getWeatherViewModel.currentWeatherState.value
+
+                                val navController = rememberNavController()
+                                NavHost(
+                                    navController = navController,
+                                    startDestination = Screen.WeatherScreen.route
+                                ) {
+                                    composable(route = Screen.WeatherScreen.route) {
+                                        WeatherInfoScreen(
+                                            getWeatherViewModel.currentWeatherState,
+                                            getWeatherViewModel.forecastState,
+                                            utils.isDeviceOnline()
+                                        )
+                                    }
+                                }
+
+                                /*val currentWeatherState = getWeatherViewModel.currentWeatherState.value
                                 Text(
                                     modifier = Modifier
                                         .padding(innerPadding)
                                         .fillMaxWidth(),
-                                    text = "Current Weather: ${currentWeatherState.currentWeatherData.main.temp}C",
+                                    text = "Current Weather: ${currentWeatherState.currentWeatherData?.main?.temp}C",
                                     textAlign = TextAlign.Center
                                 )
-                                Spacer(modifier = Modifier.padding(20.dp))
+                                Spacer(modifier = Modifier.padding(20.dp))*/
+                            } else {
+                                Text(
+                                    modifier = Modifier
+                                        .padding(innerPadding)
+                                        .fillMaxWidth(),
+                                    text = "Current Permission Status: $currentPermissionsStatus",
+                                    textAlign = TextAlign.Center,
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
-
-                            Text(
-                                modifier = Modifier
-                                    .padding(innerPadding)
-                                    .fillMaxWidth(),
-                                text = "Current Permission Status: $currentPermissionsStatus",
-                                textAlign = TextAlign.Center,
-                                fontWeight = FontWeight.Bold
-                            )
                         }
                         if (shouldShowPermissionRationale) {
                             LaunchedEffect(Unit) {
