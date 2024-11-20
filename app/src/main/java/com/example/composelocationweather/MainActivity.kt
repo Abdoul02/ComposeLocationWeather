@@ -51,6 +51,7 @@ import com.example.composelocationweather.feature_weather.presentation.GetWeathe
 import com.example.composelocationweather.feature_weather.presentation.WeatherInfoScreen
 import com.example.composelocationweather.ui.theme.ComposeLocationWeatherTheme
 import com.example.composelocationweather.util.Screen
+import com.example.composelocationweather.util.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -61,6 +62,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val getWeatherViewModel: GetWeatherViewModel = hiltViewModel()
+            val utils = Utils(this.applicationContext)
             val locationPermissions = arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION
@@ -152,7 +154,11 @@ class MainActivity : ComponentActivity() {
                                     startDestination = Screen.WeatherScreen.route
                                 ) {
                                     composable(route = Screen.WeatherScreen.route) {
-                                        WeatherInfoScreen()
+                                        WeatherInfoScreen(
+                                            getWeatherViewModel.currentWeatherState,
+                                            getWeatherViewModel.forecastState,
+                                            utils.isDeviceOnline()
+                                        )
                                     }
                                 }
 

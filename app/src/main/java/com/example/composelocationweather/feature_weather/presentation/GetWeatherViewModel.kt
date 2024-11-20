@@ -1,6 +1,5 @@
 package com.example.composelocationweather.feature_weather.presentation
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -8,14 +7,17 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.example.composelocationweather.feature_weather.domain.model.WeatherRequestData
 import com.example.composelocationweather.feature_weather.domain.model.currentWeather.CurrentWeatherModel
-import com.example.composelocationweather.feature_weather.domain.model.forecast.ForecastModel
+import com.example.composelocationweather.feature_weather.domain.model.forecast.ForecastDetail
 import com.example.composelocationweather.feature_weather.domain.use_case.WeatherUseCase
 import com.example.composelocationweather.feature_weather.presentation.state.CurrentWeatherState
 import com.example.composelocationweather.feature_weather.presentation.state.ForecastDataState
 import com.example.composelocationweather.location.AppLocationProvider
 import com.example.composelocationweather.util.Status
+import com.example.composelocationweather.util.toDayOfTheWeek
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 
@@ -28,11 +30,11 @@ class GetWeatherViewModel @Inject constructor(
     private val _currentWeatherState = mutableStateOf(CurrentWeatherState(CurrentWeatherModel()))
     val currentWeatherState: State<CurrentWeatherState> = _currentWeatherState
 
-    private val _forecastState = mutableStateOf(ForecastDataState(ForecastModel()))
+    private val _forecastState = mutableStateOf(ForecastDataState(emptyList()))
     val forecastState: State<ForecastDataState> = _forecastState
 
     fun getCurrentWeather() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             locationProvider.currentLocation.asFlow().collect { currentLocation ->
                 currentLocation?.let { location ->
                     val request = WeatherRequestData(
@@ -46,7 +48,7 @@ class GetWeatherViewModel @Inject constructor(
                                 Status.SUCCESS -> {
                                     currentWeatherResponse.data?.let { currentWeather ->
                                         _currentWeatherState.value = currentWeatherState.value.copy(
-                                            currentWeatherData = currentWeather,
+                                            currentWeatherModel = currentWeather,
                                             isLoading = false,
                                         )
                                     }
@@ -54,7 +56,7 @@ class GetWeatherViewModel @Inject constructor(
 
                                 Status.ERROR -> {
                                     _currentWeatherState.value = currentWeatherState.value.copy(
-                                        currentWeatherData = null,
+                                        currentWeatherModel = null,
                                         isLoading = false,
                                         errorMessage = currentWeatherResponse.message
                                     )
@@ -62,7 +64,7 @@ class GetWeatherViewModel @Inject constructor(
 
                                 Status.LOADING -> {
                                     _currentWeatherState.value = currentWeatherState.value.copy(
-                                        currentWeatherData = null,
+                                        currentWeatherModel = null,
                                         isLoading = true,
                                         errorMessage = null
                                     )
@@ -77,14 +79,14 @@ class GetWeatherViewModel @Inject constructor(
     }
 
     private fun getForecastData(weatherRequestData: WeatherRequestData) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             weatherUseCase.getForecastData(weatherRequestData)
                 .also { forecastResponse ->
                     when (forecastResponse.status) {
                         Status.SUCCESS -> {
                             forecastResponse.data?.let { forecastModel ->
                                 _forecastState.value = forecastState.value.copy(
-                                    forecastData = forecastModel,
+                                    forecastDetails = filterForecastDetail(forecastModel.list),
                                     isLoading = false,
                                 )
                             }
@@ -92,7 +94,7 @@ class GetWeatherViewModel @Inject constructor(
 
                         Status.ERROR -> {
                             _forecastState.value = forecastState.value.copy(
-                                forecastData = null,
+                                forecastDetails = null,
                                 isLoading = false,
                                 errorMessage = forecastResponse.message
                             )
@@ -100,7 +102,7 @@ class GetWeatherViewModel @Inject constructor(
 
                         Status.LOADING -> {
                             _forecastState.value = forecastState.value.copy(
-                                forecastData = null,
+                                forecastDetails = null,
                                 isLoading = true,
                                 errorMessage = null
                             )
@@ -111,8 +113,11 @@ class GetWeatherViewModel @Inject constructor(
     }
 
     init {
-        //locationProvider.currentLocation.
-        //val weatherRequestData = WeatherRequestData(latitude = "", longitude = "")
         getCurrentWeather()
     }
+
+    private fun filterForecastDetail(forecastDetails: List<ForecastDetail>) =
+        forecastDetails
+            .distinctBy { it.dt_txt.toDayOfTheWeek() }
+            .filter { it.dt_txt.toDayOfTheWeek()?.uppercase() != LocalDate.now().dayOfWeek.name }
 }

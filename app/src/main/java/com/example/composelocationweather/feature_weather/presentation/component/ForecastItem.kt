@@ -20,7 +20,7 @@ import com.example.composelocationweather.feature_weather.domain.model.forecast.
 import com.example.composelocationweather.feature_weather.domain.model.forecast.ForecastDetail
 import com.example.composelocationweather.feature_weather.domain.model.forecast.ForecastMain
 import com.example.composelocationweather.feature_weather.domain.model.forecast.ForecastWeather
-import com.example.composelocationweather.util.DateUtils
+import com.example.composelocationweather.util.toDayOfTheWeek
 
 
 @Composable
@@ -36,24 +36,30 @@ fun ForecastItem(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = DateUtils.getDayOfWeekFromDate(forecastDetail.dt_txt) ?: forecastDetail.dt_txt,
+            modifier = Modifier.weight(1f),
+            text = forecastDetail.dt_txt.toDayOfTheWeek() ?: forecastDetail.dt_txt,
             color = MaterialTheme.colorScheme.onPrimary
         )
-        Icon(
-            painter = painterResource(id = getDrawable(forecastDetail.weather[0].main)),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onPrimary,
-            modifier = Modifier
-                .size(25.dp)
-        )
-        Text(
-            text = stringResource(
-                R.string.current_temp,
-                forecastDetail.main.temp.toInt().toString(),
-                "\u00B0"
-            ),
-            color = MaterialTheme.colorScheme.onPrimary
-        )
+        Row(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Icon(
+                painter = painterResource(id = getDrawable(forecastDetail.weather[0].main)),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier
+                    .size(25.dp)
+            )
+            Text(
+                text = stringResource(
+                    R.string.current_temp,
+                    forecastDetail.main.temp.toInt().toString(),
+                    "\u00B0"
+                ),
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+        }
     }
 }
 
