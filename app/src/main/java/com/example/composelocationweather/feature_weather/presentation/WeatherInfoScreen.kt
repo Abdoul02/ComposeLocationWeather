@@ -1,5 +1,6 @@
 package com.example.composelocationweather.feature_weather.presentation
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
@@ -25,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import com.example.composelocationweather.R
+import com.example.composelocationweather.feature_location.domain.model.UserLocation
 import com.example.composelocationweather.feature_weather.domain.model.enums.WeatherTypes
 import com.example.composelocationweather.feature_weather.presentation.component.CurrentWeatherInfo
 import com.example.composelocationweather.feature_weather.presentation.component.CustomFloatingActionButton
@@ -36,12 +39,14 @@ import com.example.composelocationweather.feature_weather.presentation.state.For
 import com.example.composelocationweather.ui.theme.Cloudy
 import com.example.composelocationweather.ui.theme.Rainy
 import com.example.composelocationweather.ui.theme.Sunny
+import kotlinx.coroutines.launch
 
 @Composable
 fun WeatherInfoScreen(
     currentWeatherState: State<CurrentWeatherState>,
     forecastDataState: State<ForecastDataState>,
-    isDeviceOnline: Boolean
+    isDeviceOnline: Boolean,
+    onLocationSave: (UserLocation) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -59,9 +64,27 @@ fun WeatherInfoScreen(
                 SnackbarHost(hostState = snackbarHostState)
             },
             floatingActionButton = {
-                CustomFloatingActionButton(expandable = true) {
+                CustomFloatingActionButton(
+                    expandable = true,
+                    onFabClick = {},
+                    onSaveLocation = {
+                        currentWeatherData.currentWeatherModel?.let { weatherModel ->
+                            val location = UserLocation(
+                                id = weatherModel.id,
+                                latitude = weatherModel.coord.lat,
+                                longitude = weatherModel.coord.lon,
+                                name = weatherModel.name
+                            )
+                            onLocationSave(location)
+                            scope.launch {
+                                snackbarHostState.showSnackbar("Location saved!")
+                            }
+                        }
 
-                }
+                    },
+                    onGotoMap = {},
+                    onGotoLocations = {}
+                )
             },
             modifier = Modifier.fillMaxSize()
         ) { innerPadding ->
@@ -73,7 +96,6 @@ fun WeatherInfoScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 IndeterminateCircularIndicator(isLoading = currentWeatherData.isLoading)
-
                 if (currentWeatherData.currentWeatherModel?.weather?.isNotEmpty() == true) {
                     val background =
                         getBackground(currentWeatherData.currentWeatherModel.weather[0].main)
@@ -120,6 +142,8 @@ fun WeatherInfoScreen(
                             }
                         }
                     }
+                } else {
+                    Text(text = "Error getting data: ${currentWeatherData.errorMessage}")
                 }
             }
         }

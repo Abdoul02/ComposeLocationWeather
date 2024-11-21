@@ -18,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,6 +37,9 @@ fun CustomFloatingActionButton(
     expandable: Boolean,
     fabIcon: ImageVector = Icons.Default.Add,
     onFabClick: () -> Unit,
+    onGotoMap: () -> Unit,
+    onGotoLocations: () -> Unit,
+    onSaveLocation: () -> Unit,
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     if (!expandable) { // Close the expanded fab if you change to non expandable nav destination
@@ -75,9 +77,9 @@ fun CustomFloatingActionButton(
                 .padding(16.dp)
         ) {
             FloatingActionItems(
-                onSaveLocation = {},
-                onGotoMap = {},
-                onGotoLocations = {},
+                onSaveLocation = { onSaveLocation() },
+                onGotoMap = { onGotoMap() },
+                onGotoLocations = { onGotoLocations() },
             )
         }
 
@@ -104,7 +106,7 @@ fun CustomFloatingActionButton(
                     .size(24.dp)
                     .offset(
                         x = animateDpAsState(
-                            if (isExpanded) -70.dp else 0.dp,
+                            if (isExpanded) (-70).dp else 0.dp,
                             animationSpec = spring(dampingRatio = 3f),
                             label = ""
                         ).value
@@ -112,7 +114,7 @@ fun CustomFloatingActionButton(
             )
 
             Text(
-                text = "Select Option",
+                text = "Click to close",
                 softWrap = false,
                 color = Color.White,
                 modifier = Modifier
@@ -146,8 +148,10 @@ fun CustomFloatingActionButtonPreview() {
     val fabIcon = Icons.Default.Add
     CustomFloatingActionButton(
         true,
-        fabIcon = fabIcon
-    ) {
-
-    }
+        fabIcon = fabIcon,
+        onFabClick = {},
+        onSaveLocation = {},
+        onGotoMap = {},
+        onGotoLocations = {}
+    )
 }
