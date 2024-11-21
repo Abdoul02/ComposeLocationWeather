@@ -18,7 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.composelocationweather.R
-import com.example.composelocationweather.util.toDate
+import com.example.composelocationweather.util.toDateFromUnix
 
 @Composable
 fun CurrentWeatherInfo(
@@ -53,7 +53,7 @@ fun CurrentWeatherInfo(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = lastSync.toDate(),
+                    text = lastSync.toDateFromUnix(),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontWeight = FontWeight.Bold

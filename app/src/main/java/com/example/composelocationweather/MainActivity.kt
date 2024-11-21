@@ -46,11 +46,12 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.composelocationweather.feature_location.presentation.LocationScreen
 import com.example.composelocationweather.feature_location.presentation.LocationViewModel
 import com.example.composelocationweather.feature_weather.presentation.GetWeatherViewModel
 import com.example.composelocationweather.feature_weather.presentation.WeatherInfoScreen
 import com.example.composelocationweather.ui.theme.ComposeLocationWeatherTheme
-import com.example.composelocationweather.util.Screen
+import com.example.composelocationweather.util.Screens
 import com.example.composelocationweather.util.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -109,8 +110,11 @@ class MainActivity : ComponentActivity() {
                     locationPermissionsGranted,
                     shouldShowPermissionRationale
                 )
-                Log.d("AppPermission","Permission Status: ${areLocationPermissionsAlreadyGranted()}")
-                Log.d("AppPermission","currentPermissionsStatus: $currentPermissionsStatus")
+                Log.d(
+                    "AppPermission",
+                    "Permission Status: ${areLocationPermissionsAlreadyGranted()}"
+                )
+                Log.d("AppPermission", "currentPermissionsStatus: $currentPermissionsStatus")
             }
 
             val lifecycleOwner = LocalLifecycleOwner.current
@@ -149,21 +153,29 @@ class MainActivity : ComponentActivity() {
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-
                             if (areLocationPermissionsAlreadyGranted()) {
 
                                 val navController = rememberNavController()
                                 NavHost(
                                     navController = navController,
-                                    startDestination = Screen.WeatherScreen.route
+                                    startDestination = Screens.WeatherScreen
                                 ) {
-                                    composable(route = Screen.WeatherScreen.route) {
+                                    composable<Screens.WeatherScreen> {
                                         WeatherInfoScreen(
+                                            navController,
                                             getWeatherViewModel.currentWeatherState,
                                             getWeatherViewModel.forecastState,
                                             utils.isDeviceOnline(),
                                         ) { location ->
                                             locationViewModel.saveUserLocation(location)
+                                        }
+                                    }
+
+                                    composable<Screens.LocationScreen> {
+                                        LocationScreen(
+                                            locationListState = locationViewModel.locationListState
+                                        ) { location ->
+                                            locationViewModel.deleteUserLocation(location)
                                         }
                                     }
                                 }

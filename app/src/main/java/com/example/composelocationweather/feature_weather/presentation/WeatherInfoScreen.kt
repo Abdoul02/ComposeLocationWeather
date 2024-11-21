@@ -26,6 +26,7 @@ import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.navigation.NavController
 import com.example.composelocationweather.R
 import com.example.composelocationweather.feature_location.domain.model.UserLocation
 import com.example.composelocationweather.feature_weather.domain.model.enums.WeatherTypes
@@ -39,10 +40,12 @@ import com.example.composelocationweather.feature_weather.presentation.state.For
 import com.example.composelocationweather.ui.theme.Cloudy
 import com.example.composelocationweather.ui.theme.Rainy
 import com.example.composelocationweather.ui.theme.Sunny
+import com.example.composelocationweather.util.Screens
 import kotlinx.coroutines.launch
 
 @Composable
 fun WeatherInfoScreen(
+    navController: NavController,
     currentWeatherState: State<CurrentWeatherState>,
     forecastDataState: State<ForecastDataState>,
     isDeviceOnline: Boolean,
@@ -83,7 +86,9 @@ fun WeatherInfoScreen(
 
                     },
                     onGotoMap = {},
-                    onGotoLocations = {}
+                    onGotoLocations = {
+                        navController.navigate(Screens.LocationScreen)
+                    }
                 )
             },
             modifier = Modifier.fillMaxSize()
@@ -132,7 +137,6 @@ fun WeatherInfoScreen(
                     ) {
                         IndeterminateCircularIndicator(isLoading = forecastData.isLoading)
                         Column {
-
                             forecastData.forecastDetails?.let { forecast ->
                                 LazyColumn(modifier = Modifier.fillMaxWidth()) {
                                     items(forecast) { forecastDetail ->

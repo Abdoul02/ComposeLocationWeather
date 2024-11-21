@@ -37,6 +37,10 @@ class LocationViewModel @Inject constructor(
         }
     }
 
+    init {
+        getAllLocations()
+    }
+
     fun deleteUserLocation(location: UserLocation) {
         viewModelScope.launch(Dispatchers.IO) {
             locationUseCases.deleteLocation(location)
@@ -46,7 +50,7 @@ class LocationViewModel @Inject constructor(
     fun getLocationById(id: Int) {
     }
 
-    fun getAllLocations() {
+    private fun getAllLocations() {
         getLocationsJob?.cancel()
         getLocationsJob = locationUseCases.getLocations()
             .onEach { locations ->
