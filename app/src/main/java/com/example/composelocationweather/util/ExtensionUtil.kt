@@ -13,10 +13,16 @@ fun String.toDayOfTheWeek(): String? {
     return date?.let { dayOfWeekFormat.format(it) }
 }
 
-fun Long.toDate(): String {
+fun Long.toDateFromUnix(): String {
     val formatter = SimpleDateFormat("dd-MMM-yyyy hh:mm:ss", Locale.getDefault())
     val calender = Calendar.getInstance()
     calender.timeInMillis = this * 1000L
+    return formatter.format(calender.time)
+}
+fun Long.toDate(): String {
+    val formatter = SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault())
+    val calender = Calendar.getInstance()
+    calender.timeInMillis = this
     return formatter.format(calender.time)
 }
 

@@ -1,7 +1,5 @@
 package com.example.composelocationweather.feature_weather.data.repository
 
-import android.util.Log
-import com.example.composelocationweather.BuildConfig
 import com.example.composelocationweather.feature_weather.data.local.dao.CurrentWeatherDao
 import com.example.composelocationweather.feature_weather.data.local.dao.ForecastDataDao
 import com.example.composelocationweather.feature_weather.data.remote.RetrofitAPI
@@ -11,7 +9,6 @@ import com.example.composelocationweather.feature_weather.domain.model.WeatherRe
 import com.example.composelocationweather.feature_weather.domain.model.currentWeather.CurrentWeatherModel
 import com.example.composelocationweather.feature_weather.domain.model.forecast.ForecastModel
 import com.example.composelocationweather.feature_weather.domain.repository.WeatherRepository
-import com.example.composelocationweather.util.ConstantData
 import com.example.composelocationweather.util.Resource
 import javax.inject.Inject
 

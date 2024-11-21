@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.org.jetbrains.kotlin.kapt)
     //alias(libs.plugins.ksp)
     alias(libs.plugins.dagger.hilt.android)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
 android {
@@ -66,6 +67,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.kotlinx.serialization.json)
 
     //Network
     implementation(libs.okhttp)

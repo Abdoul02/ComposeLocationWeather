@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -13,7 +14,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -38,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -47,10 +46,12 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.composelocationweather.feature_location.presentation.LocationScreen
+import com.example.composelocationweather.feature_location.presentation.LocationViewModel
 import com.example.composelocationweather.feature_weather.presentation.GetWeatherViewModel
 import com.example.composelocationweather.feature_weather.presentation.WeatherInfoScreen
 import com.example.composelocationweather.ui.theme.ComposeLocationWeatherTheme
-import com.example.composelocationweather.util.Screen
+import com.example.composelocationweather.util.Screens
 import com.example.composelocationweather.util.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -62,6 +63,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val getWeatherViewModel: GetWeatherViewModel = hiltViewModel()
+            val locationViewModel: LocationViewModel = hiltViewModel()
+
             val utils = Utils(this.applicationContext)
             val locationPermissions = arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
@@ -107,6 +110,11 @@ class MainActivity : ComponentActivity() {
                     locationPermissionsGranted,
                     shouldShowPermissionRationale
                 )
+                Log.d(
+                    "AppPermission",
+                    "Permission Status: ${areLocationPermissionsAlreadyGranted()}"
+                )
+                Log.d("AppPermission", "currentPermissionsStatus: $currentPermissionsStatus")
             }
 
             val lifecycleOwner = LocalLifecycleOwner.current
@@ -145,32 +153,32 @@ class MainActivity : ComponentActivity() {
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-
                             if (areLocationPermissionsAlreadyGranted()) {
 
                                 val navController = rememberNavController()
                                 NavHost(
                                     navController = navController,
-                                    startDestination = Screen.WeatherScreen.route
+                                    startDestination = Screens.WeatherScreen
                                 ) {
-                                    composable(route = Screen.WeatherScreen.route) {
+                                    composable<Screens.WeatherScreen> {
                                         WeatherInfoScreen(
+                                            navController,
                                             getWeatherViewModel.currentWeatherState,
                                             getWeatherViewModel.forecastState,
-                                            utils.isDeviceOnline()
-                                        )
+                                            utils.isDeviceOnline(),
+                                        ) { location ->
+                                            locationViewModel.saveUserLocation(location)
+                                        }
+                                    }
+
+                                    composable<Screens.LocationScreen> {
+                                        LocationScreen(
+                                            locationListState = locationViewModel.locationListState
+                                        ) { location ->
+                                            locationViewModel.deleteUserLocation(location)
+                                        }
                                     }
                                 }
-
-                                /*val currentWeatherState = getWeatherViewModel.currentWeatherState.value
-                                Text(
-                                    modifier = Modifier
-                                        .padding(innerPadding)
-                                        .fillMaxWidth(),
-                                    text = "Current Weather: ${currentWeatherState.currentWeatherData?.main?.temp}C",
-                                    textAlign = TextAlign.Center
-                                )
-                                Spacer(modifier = Modifier.padding(20.dp))*/
                             } else {
                                 Text(
                                     modifier = Modifier
