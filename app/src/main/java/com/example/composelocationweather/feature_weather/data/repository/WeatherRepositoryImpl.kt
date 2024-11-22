@@ -38,7 +38,7 @@ class WeatherRepositoryImpl @Inject constructor(
                     return@let Resource.success(it)
                 } ?: Resource.error("Error, Empty forecast data", null)
             } else {
-                Resource.error("Error, response was not successful: ${response.message()}", null)
+                Resource.error("Error, couldn't get weather data", null)
             }
         } catch (e: Exception) {
             Resource.error("Error getting currentWeather data: ${e.message}", null)

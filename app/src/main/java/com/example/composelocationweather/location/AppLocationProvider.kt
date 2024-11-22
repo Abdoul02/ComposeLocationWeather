@@ -83,7 +83,7 @@ class AppLocationProvider @Inject constructor(@ApplicationContext val context: C
         )
     }
 
-    private fun areLocationPermissionsAlreadyGranted(): Boolean {
+     fun areLocationPermissionsAlreadyGranted(): Boolean {
         return ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.ACCESS_FINE_LOCATION
