@@ -51,6 +51,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.composelocationweather.feature_location.presentation.LocationScreen
 import com.example.composelocationweather.feature_location.presentation.LocationViewModel
+import com.example.composelocationweather.feature_location.presentation.MapsScreen
 import com.example.composelocationweather.feature_weather.presentation.GetWeatherViewModel
 import com.example.composelocationweather.feature_weather.presentation.WeatherInfoScreen
 import com.example.composelocationweather.location.AppLocationProvider
@@ -93,7 +94,11 @@ class MainActivity : ComponentActivity() {
 
             val scope = rememberCoroutineScope()
             val snackbarHostState = remember { SnackbarHostState() }
-            var arePermissionGranted by remember { mutableStateOf(areLocationPermissionsAlreadyGranted()) }
+            var arePermissionGranted by remember {
+                mutableStateOf(
+                    areLocationPermissionsAlreadyGranted()
+                )
+            }
 
             val permissionLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.RequestMultiplePermissions(),
@@ -179,6 +184,13 @@ class MainActivity : ComponentActivity() {
                                             ) { location ->
                                                 locationViewModel.deleteUserLocation(location)
                                             }
+                                        }
+
+                                        composable<Screens.MapScreen> {
+                                            MapsScreen(
+                                                locationListState = locationViewModel.locationListState,
+                                                currentLocation = appLocationProvider.currentLocation
+                                            )
                                         }
                                     }
                                 } else {

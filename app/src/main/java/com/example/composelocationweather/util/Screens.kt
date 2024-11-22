@@ -11,5 +11,8 @@ object Screens {
     object LocationScreen
 
     @Serializable
+    object MapScreen
+
+    @Serializable
     data class LocationDetail(val id: Int)
 }
