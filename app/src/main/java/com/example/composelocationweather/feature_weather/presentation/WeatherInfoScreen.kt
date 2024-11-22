@@ -147,7 +147,8 @@ fun WeatherInfoScreen(
                         }
                     }
                 } else {
-                    Text(text = "Error getting data: ${currentWeatherData.errorMessage}")
+                    val message = currentWeatherData.errorMessage ?: "Getting current weather"
+                    Text(text = message)
                 }
             }
         }

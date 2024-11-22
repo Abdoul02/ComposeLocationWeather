@@ -1,5 +1,6 @@
 package com.example.composelocationweather.feature_weather.presentation
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -34,7 +35,21 @@ class GetWeatherViewModel @Inject constructor(
     val forecastState: State<ForecastDataState> = _forecastState
 
     fun getCurrentWeather() {
+        _currentWeatherState.value = currentWeatherState.value.copy(
+            currentWeatherModel = null,
+            isLoading = true,
+            errorMessage = null
+        )
+        if (!locationProvider.isLocationEnabled()) {
+            _currentWeatherState.value = currentWeatherState.value.copy(
+                currentWeatherModel = null,
+                isLoading = false,
+                errorMessage = "Please enable location"
+            )
+            return
+        }
         viewModelScope.launch(Dispatchers.IO) {
+            locationProvider.getCurrentLocation()
             locationProvider.currentLocation.asFlow().collect { currentLocation ->
                 currentLocation?.let { location ->
                     val request = WeatherRequestData(

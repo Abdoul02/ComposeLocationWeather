@@ -21,7 +21,7 @@ import javax.inject.Inject
 class AppLocationProvider @Inject constructor(@ApplicationContext val context: Context) {
 
     private val mutableCurrentLocation = MutableLiveData<Location?>()
-    val currentLocation: MutableLiveData<Location?>
+    val currentLocation: LiveData<Location?>
         get() = mutableCurrentLocation
 
     private val fusedLocation = LocationServices.getFusedLocationProviderClient(context)
