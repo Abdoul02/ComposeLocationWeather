@@ -13,7 +13,7 @@ runtime-livedata = "1.7.5"
 serialization = "1.6.3"
 
 #Network
-okhttp = "4.12.0" # https://github.com/square/okhttp/blob/master/docs/changelogs/changelog_4x.md
+okhttp = "4.12.0"
 retrofit = "2.11.0" # https://github.com/square/retrofit/blob/master/CHANGELOG.md
 
 #Database
@@ -21,6 +21,9 @@ room = "2.6.1"
 
 #location
 location = "21.3.0"
+maps-compose = "2.9.0"
+play-services-maps = "19.0.0"
+
 
 #Coroutines
 coroutines = "1.7.3"
@@ -84,6 +87,8 @@ coroutine-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android
 
 #location
 location = { module = "com.google.android.gms:play-services-location", version.ref = "location" }
+maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "maps-compose" }
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "play-services-maps" }
 
 #Hilt
 hilt-navigation = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt_navigation" }

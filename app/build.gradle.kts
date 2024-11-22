@@ -90,6 +90,8 @@ dependencies {
 
     //Location
     implementation(libs.location)
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.maps)
 
     //hilt
     implementation(libs.hilt.navigation)

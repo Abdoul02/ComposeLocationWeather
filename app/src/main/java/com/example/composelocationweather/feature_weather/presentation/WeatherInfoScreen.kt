@@ -85,7 +85,9 @@ fun WeatherInfoScreen(
                         }
 
                     },
-                    onGotoMap = {},
+                    onGotoMap = {
+                        navController.navigate(Screens.MapScreen)
+                    },
                     onGotoLocations = {
                         navController.navigate(Screens.LocationScreen)
                     }
