@@ -27,7 +27,7 @@ and uncomment the following code under build.gradle.kts
         buildConfigField("String", "WEATHER_API_KEY",weatherApiKey)*/`
 
 The Google maps key is restricted and therefore needs to be replaced with your own. Please replace
-`google_maps_key` in the string.xml file.
+`google_maps_key` in the string.xml file. (An APK Will be provided for Test)
 
 The Application was built on `Android Studio Ladybug | 2024.2.` there is currently a bug where tests
 do not have access to classes that are in the main Java file. Apparently this was resolved in the
