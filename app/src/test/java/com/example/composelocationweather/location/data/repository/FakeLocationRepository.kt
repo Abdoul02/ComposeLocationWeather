@@ -33,7 +33,6 @@ class FakeLocationRepository : LocationRepository {
     }
 
     override suspend fun getLocationInformation(
-        key: String,
         location: String
     ): Resource<PlacesResponse> {
         return Resource.success(placesResponse)
