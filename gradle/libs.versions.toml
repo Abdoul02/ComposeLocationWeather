@@ -36,6 +36,7 @@ compose_viewmodel = "2.8.7"
 hilt_navigation = "1.2.0"
 hilt_android = "2.52"
 navigation_testing = "2.8.4"
+hilt_android_testing = "2.43.2"
 hilt_kapt_android_comp = "1.2.0"
 
 #Test
@@ -44,6 +45,7 @@ mockito-inline = "5.2.0"
 mockito-core = "5.14.2"
 coroutine-test = "1.7.1"
 android-core-testing = "2.2.0"
+google-truth = "1.1.5"
 
 ksp = "2.0.0-1.0.24"
 
@@ -97,6 +99,7 @@ coil = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 hilt-navigation = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt_navigation" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt_android" }
 hilt-test = { module = "androidx.navigation:navigation-testing", version.ref = "navigation_testing" }
+hilt-android-test = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt_android_testing" }
 hilt-kapt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt_android" }
 hilt-kapt-compiler-android = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt_kapt_android_comp" }
 
@@ -106,6 +109,9 @@ coroutine-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", ver
 androidx-core-test = { module = "androidx.arch.core:core-testing", version.ref = "android-core-testing" }
 mockito-inline = {module = "org.mockito:mockito-inline", version.ref = "mockito-inline"}
 mockito-core = {module = "org.mockito:mockito-core", version.ref = "mockito-core"}
+google-truth = {module = "com.google.truth:truth", version.ref = "google-truth"}
+
+#UI Testing
 
 
 [plugins]

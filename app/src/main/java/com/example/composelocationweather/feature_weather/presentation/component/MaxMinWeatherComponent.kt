@@ -10,12 +10,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.composelocationweather.R
 import com.example.composelocationweather.feature_weather.domain.model.currentWeather.Main
+import com.example.composelocationweather.util.TestTags
 
 
 @Composable
@@ -31,12 +33,12 @@ fun MaxMinWeatherComponent(
     ) {
         Row(modifier = Modifier.weight(0.75f)) {
             TemperatureInfo(
-
+                modifier = Modifier.testTag(TestTags.CURRENT_MIN_TEMP_TEXT),
                 info = "min",
                 degree = stringResource(
                     R.string.current_temp,
                     currentWeatherInfo.temp_min.toInt().toString(),
-                    "\u00B0"
+                    "\u00B0",
                 )
             )
         }
@@ -45,6 +47,7 @@ fun MaxMinWeatherComponent(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             TemperatureInfo(
+                modifier = Modifier.testTag(TestTags.CURRENT_TEMP_INFO_TEXT),
                 info = "Current",
                 degree = stringResource(
                     R.string.current_temp,
@@ -53,6 +56,7 @@ fun MaxMinWeatherComponent(
                 )
             )
             TemperatureInfo(
+                modifier = Modifier.testTag(TestTags.CURRENT_MAX_TEMP_TEXT),
                 info = "max",
                 degree = stringResource(
                     R.string.current_temp,
@@ -77,7 +81,7 @@ fun TemperatureInfo(
         Text(
             text = degree,
             color = MaterialTheme.colorScheme.onPrimary,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
         Text(text = info, color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
     }

@@ -29,6 +29,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -77,115 +78,120 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
 
+            ComposeLocationWeatherTheme {
+                MainApp()
+            }
+        }
+    }
 
-            val getWeatherViewModel: GetWeatherViewModel = hiltViewModel()
-            val locationViewModel: LocationViewModel = hiltViewModel()
+    @Composable
+    fun MainApp() {
+        val getWeatherViewModel: GetWeatherViewModel = hiltViewModel()
+        val locationViewModel: LocationViewModel = hiltViewModel()
             val placesViewModel: PlacesViewModel = hiltViewModel()
 
-            val utils = Utils(this.applicationContext)
-            val locationPermissions = arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
+        val utils = Utils(this.applicationContext)
+        val locationPermissions = arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
 
-            var shouldDirectUserToApplicationSettings by remember {
-                mutableStateOf(false)
+        var shouldDirectUserToApplicationSettings by remember {
+            mutableStateOf(false)
+        }
+        var shouldShowPermissionRationale by remember {
+            mutableStateOf(
+                shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)
+            )
+        }
+
+        val scope = rememberCoroutineScope()
+        val snackbarHostState = remember { SnackbarHostState() }
+        var arePermissionGranted by remember {
+            mutableStateOf(
+                areLocationPermissionsAlreadyGranted()
+            )
+        }
+
+        val permissionLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestMultiplePermissions(),
+
+            ) { permissions ->
+            val permissionsGranted = permissions.values.reduce { acc, isPermissionGranted ->
+                acc && isPermissionGranted
             }
-            var shouldShowPermissionRationale by remember {
-                mutableStateOf(
+            if (!permissionsGranted) {
+                shouldShowPermissionRationale =
                     shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)
-                )
             }
+            shouldDirectUserToApplicationSettings =
+                !shouldShowPermissionRationale && !areLocationPermissionsAlreadyGranted()
 
-            val scope = rememberCoroutineScope()
-            val snackbarHostState = remember { SnackbarHostState() }
-            var arePermissionGranted by remember {
-                mutableStateOf(
-                    areLocationPermissionsAlreadyGranted()
-                )
-            }
-
-            val permissionLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.RequestMultiplePermissions(),
-
-                ) { permissions ->
-                val permissionsGranted = permissions.values.reduce { acc, isPermissionGranted ->
-                    acc && isPermissionGranted
-                }
-                if (!permissionsGranted) {
-                    shouldShowPermissionRationale =
-                        shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)
-                }
-                shouldDirectUserToApplicationSettings =
-                    !shouldShowPermissionRationale && !areLocationPermissionsAlreadyGranted()
-
-                arePermissionGranted = areLocationPermissionsAlreadyGranted()
-                if (areLocationPermissionsAlreadyGranted()) {
-                    if (appLocationProvider.isLocationEnabled()) {
-                        getWeatherViewModel.getCurrentWeather()
-                    } else {
-                        scope.launch {
-                            snackbarHostState.showSnackbar("Please enable location to continue")
-                        }
-                        gotoLocationSetting()
+            arePermissionGranted = areLocationPermissionsAlreadyGranted()
+            if (areLocationPermissionsAlreadyGranted()) {
+                if (appLocationProvider.isLocationEnabled()) {
+                    getWeatherViewModel.getCurrentWeather()
+                } else {
+                    scope.launch {
+                        snackbarHostState.showSnackbar("Please enable location to continue")
                     }
+                    gotoLocationSetting()
                 }
             }
+        }
 
-            val lifecycleOwner = LocalLifecycleOwner.current
-            DisposableEffect(key1 = lifecycleOwner, effect = {
-                val observer = LifecycleEventObserver { _, event ->
-                    if (event == Lifecycle.Event.ON_START &&
-                        !areLocationPermissionsAlreadyGranted() &&
-                        !shouldShowPermissionRationale
-                    ) {
-                        permissionLauncher.launch(locationPermissions)
-                    }
-                }
-                lifecycleOwner.lifecycle.addObserver(observer)
-                onDispose {
-                    lifecycleOwner.lifecycle.removeObserver(observer)
-                }
-            }
-            )
-
-            ComposeLocationWeatherTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+        val lifecycleOwner = LocalLifecycleOwner.current
+        DisposableEffect(key1 = lifecycleOwner, effect = {
+            val observer = LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_START &&
+                    !areLocationPermissionsAlreadyGranted() &&
+                    !shouldShowPermissionRationale
                 ) {
-                    Scaffold(
-                        snackbarHost = {
-                            SnackbarHost(hostState = snackbarHostState)
-                        },
-                        modifier = Modifier.fillMaxSize()
-                    ) { innerPadding ->
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            if (arePermissionGranted) {
-                                if (appLocationProvider.isLocationEnabled()) {
-                                    val navController = rememberNavController()
-                                    NavHost(
-                                        navController = navController,
-                                        startDestination = Screens.WeatherScreen
-                                    ) {
-                                        composable<Screens.WeatherScreen> {
-                                            WeatherInfoScreen(
-                                                navController,
-                                                getWeatherViewModel.currentWeatherState,
-                                                getWeatherViewModel.forecastState,
-                                                utils.isDeviceOnline(),
-                                            ) { location ->
-                                                locationViewModel.saveUserLocation(location)
-                                            }
-                                        }
+                    permissionLauncher.launch(locationPermissions)
+                }
+            }
+            lifecycleOwner.lifecycle.addObserver(observer)
+            onDispose {
+                lifecycleOwner.lifecycle.removeObserver(observer)
+            }
+        }
+        )
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            Scaffold(
+                snackbarHost = {
+                    SnackbarHost(hostState = snackbarHostState)
+                },
+                modifier = Modifier.fillMaxSize()
+            ) { innerPadding ->
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (arePermissionGranted) {
+                        if (appLocationProvider.isLocationEnabled()) {
+                            val navController = rememberNavController()
+                            NavHost(
+                                navController = navController,
+                                startDestination = Screens.WeatherScreen
+                            ) {
+                                composable<Screens.WeatherScreen> {
+                                    WeatherInfoScreen(
+                                        navController,
+                                        getWeatherViewModel.currentWeatherState,
+                                        getWeatherViewModel.forecastState,
+                                        utils.isDeviceOnline(),
+                                    ) { location ->
+                                        locationViewModel.saveUserLocation(location)
+                                    }
+                                }
 
-                                        composable<Screens.LocationScreen> {
-                                            LocationScreen(
-                                                navController = navController,
+                                composable<Screens.LocationScreen> {
+                                    LocationScreen(
+                                        navController = navController,
                                                 locationListState = locationViewModel.locationStateFlow.collectAsStateWithLifecycle()
                                             ) { location ->
                                                 locationViewModel.deleteUserLocation(location)
@@ -212,74 +218,72 @@ class MainActivity : ComponentActivity() {
                                     }
                                 } else {
 
-                                    Text(
-                                        modifier = Modifier
-                                            .padding(innerPadding)
-                                            .fillMaxWidth(),
-                                        text = "Please enable location and click refresh",
-                                        textAlign = TextAlign.Center,
-                                        fontWeight = FontWeight.Bold
-                                    )
+                            Text(
+                                modifier = Modifier
+                                    .padding(innerPadding)
+                                    .fillMaxWidth(),
+                                text = "Please enable location and click refresh",
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold
+                            )
 
-                                    IconButton(
-                                        onClick = {
-                                            if (appLocationProvider.isLocationEnabled()) {
-                                                getWeatherViewModel.getCurrentWeather()
-                                            } else {
-                                                scope.launch {
-                                                    snackbarHostState.showSnackbar("Please enable location to continue")
-                                                }
-                                            }
+                            IconButton(
+                                onClick = {
+                                    if (appLocationProvider.isLocationEnabled()) {
+                                        getWeatherViewModel.getCurrentWeather()
+                                    } else {
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar("Please enable location to continue")
                                         }
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Refresh,
-                                            contentDescription = "Get current weather",
-                                            modifier = Modifier.size(48.dp)
-                                        )
                                     }
                                 }
-                            } else {
-                                Text(
-                                    modifier = Modifier
-                                        .padding(innerPadding)
-                                        .fillMaxWidth(),
-                                    text = "Location permission required",
-                                    textAlign = TextAlign.Center,
-                                    fontWeight = FontWeight.Bold
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Refresh,
+                                    contentDescription = "Get current weather",
+                                    modifier = Modifier.size(48.dp)
                                 )
                             }
                         }
-                        if (shouldShowPermissionRationale) {
-                            LaunchedEffect(Unit) {
-                                scope.launch {
-                                    val userAction = snackbarHostState.showSnackbar(
-                                        message = "Please authorize location permissions",
-                                        actionLabel = "Approve",
-                                        duration = SnackbarDuration.Indefinite,
-                                        withDismissAction = true
-                                    )
-                                    when (userAction) {
-                                        SnackbarResult.ActionPerformed -> {
-                                            shouldShowPermissionRationale = false
-                                            permissionLauncher.launch(locationPermissions)
-                                        }
+                    } else {
+                        Text(
+                            modifier = Modifier
+                                .padding(innerPadding)
+                                .fillMaxWidth(),
+                            text = "Location permission required",
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+                if (shouldShowPermissionRationale) {
+                    LaunchedEffect(Unit) {
+                        scope.launch {
+                            val userAction = snackbarHostState.showSnackbar(
+                                message = "Please authorize location permissions",
+                                actionLabel = "Approve",
+                                duration = SnackbarDuration.Indefinite,
+                                withDismissAction = true
+                            )
+                            when (userAction) {
+                                SnackbarResult.ActionPerformed -> {
+                                    shouldShowPermissionRationale = false
+                                    permissionLauncher.launch(locationPermissions)
+                                }
 
-                                        SnackbarResult.Dismissed -> {
-                                            shouldShowPermissionRationale = false
-                                        }
-                                    }
+                                SnackbarResult.Dismissed -> {
+                                    shouldShowPermissionRationale = false
                                 }
                             }
                         }
-
-                        if (shouldDirectUserToApplicationSettings) {
-                            openApplicationSettings()
-                        }
                     }
+                }
 
+                if (shouldDirectUserToApplicationSettings) {
+                    openApplicationSettings()
                 }
             }
+
         }
     }
 

@@ -20,12 +20,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.composelocationweather.feature_location.domain.model.UserLocation
 import com.example.composelocationweather.feature_location.presentation.components.LocationItem
 import com.example.composelocationweather.feature_location.presentation.state.LocationListState
+import com.example.composelocationweather.util.TestTags
 import com.example.composelocationweather.util.Screens
 import kotlinx.coroutines.launch
 
@@ -59,7 +61,8 @@ fun LocationScreen(
                     Text(
                         text = "Favorite Locations",
                         style = MaterialTheme.typography.headlineLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.testTag(TestTags.FAVORITE_LOCATION_TITLE)
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     LazyColumn {

@@ -30,7 +30,8 @@ android {
         val placesApiKey = System.getenv("PLACES_API_KEY") ?: ""
         buildConfigField("String", "PLACES_API_KEY", "\"${placesApiKey}\"")
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        //testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.example.composelocationweather.HiltTestRunner"
     }
 
     buildTypes {
@@ -112,6 +113,9 @@ dependencies {
 
 
 
+    androidTestImplementation(libs.androidx.core.test)
+    androidTestImplementation(libs.hilt.android.test)
+    androidTestImplementation(libs.google.truth)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
