@@ -1,8 +1,8 @@
 package com.example.composelocationweather.feature_weather.data.repository
 
+import com.example.composelocationweather.api.RetrofitAPI
 import com.example.composelocationweather.feature_weather.data.local.dao.CurrentWeatherDao
 import com.example.composelocationweather.feature_weather.data.local.dao.ForecastDataDao
-import com.example.composelocationweather.feature_weather.data.remote.RetrofitAPI
 import com.example.composelocationweather.feature_weather.domain.model.CurrentWeatherData
 import com.example.composelocationweather.feature_weather.domain.model.ForecastData
 import com.example.composelocationweather.feature_weather.domain.model.WeatherRequestData

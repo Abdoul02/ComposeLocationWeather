@@ -23,14 +23,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.composelocationweather.feature_location.domain.model.UserLocation
 import com.example.composelocationweather.feature_location.presentation.components.LocationItem
 import com.example.composelocationweather.feature_location.presentation.state.LocationListState
 import com.example.composelocationweather.util.TestTags
+import com.example.composelocationweather.util.Screens
 import kotlinx.coroutines.launch
 
 @Composable
 fun LocationScreen(
+    navController: NavController,
     locationListState: State<LocationListState>,
     onLocationDelete: (UserLocation) -> Unit
 ) {
@@ -64,12 +67,24 @@ fun LocationScreen(
                     Spacer(modifier = Modifier.height(20.dp))
                     LazyColumn {
                         items(locations) { location ->
-                            LocationItem(location = location) {
-                                onLocationDelete(location)
-                                scope.launch {
-                                    snackbarHostState.showSnackbar("Location deleted!")
+                            LocationItem(
+                                location = location,
+                                onDeleteClick = {
+
+                                    onLocationDelete(location)
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar("Location deleted!")
+                                    }
+                                },
+                                onItemClick = {
+                                    navController.navigate(
+                                        Screens.LocationDetail(
+                                            "${location.latitude},${location.longitude}",
+                                            location.name
+                                        )
+                                    )
                                 }
-                            }
+                            )
                         }
                     }
                 }

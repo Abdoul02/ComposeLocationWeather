@@ -14,5 +14,5 @@ object Screens {
     object MapScreen
 
     @Serializable
-    data class LocationDetail(val id: Int)
+    data class LocationDetail(val userLocation: String, val name: String)
 }

@@ -4,5 +4,6 @@ data class LocationUseCases(
     val saveLocation: SaveLocation,
     val getLocations: GetLocations,
     val getLocationById: GetLocationById,
-    val deleteLocation: DeleteLocation
+    val deleteLocation: DeleteLocation,
+    val getLocationInformation: GetLocationInformation
 )

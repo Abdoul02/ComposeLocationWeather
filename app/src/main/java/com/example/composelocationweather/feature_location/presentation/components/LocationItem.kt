@@ -1,5 +1,6 @@
 package com.example.composelocationweather.feature_location.presentation.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,7 +30,8 @@ import com.example.composelocationweather.util.toDate
 fun LocationItem(
     modifier: Modifier = Modifier,
     location: UserLocation,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    onItemClick: () -> Unit
 ) {
     Card(
         shape = RoundedCornerShape(9.dp),
@@ -37,6 +39,9 @@ fun LocationItem(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onPrimary),
         modifier = modifier
             .padding(5.dp)
+            .clickable {
+                onItemClick()
+            }
     ) {
         Row(
             modifier = Modifier
@@ -71,5 +76,5 @@ fun LocationItem(
 @Preview
 fun LocationItemPreview() {
     val location = UserLocation(0, 0.0, 0.0, "Pretoria", System.currentTimeMillis())
-    LocationItem(location = location) {}
+    LocationItem(location = location, onItemClick = {}, onDeleteClick = {})
 }
