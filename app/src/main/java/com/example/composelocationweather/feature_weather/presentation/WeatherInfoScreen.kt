@@ -28,12 +28,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import com.example.composelocationweather.R
+import com.example.composelocationweather.common.component.IndeterminateCircularIndicator
 import com.example.composelocationweather.feature_location.domain.model.UserLocation
 import com.example.composelocationweather.feature_weather.domain.model.enums.WeatherTypes
 import com.example.composelocationweather.feature_weather.presentation.component.CurrentWeatherInfo
 import com.example.composelocationweather.feature_weather.presentation.component.CustomFloatingActionButton
 import com.example.composelocationweather.feature_weather.presentation.component.ForecastItem
-import com.example.composelocationweather.feature_weather.presentation.component.IndeterminateCircularIndicator
 import com.example.composelocationweather.feature_weather.presentation.component.MaxMinWeatherComponent
 import com.example.composelocationweather.feature_weather.presentation.state.CurrentWeatherState
 import com.example.composelocationweather.feature_weather.presentation.state.ForecastDataState

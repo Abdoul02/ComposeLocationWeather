@@ -51,9 +51,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import com.example.composelocationweather.feature_location.presentation.LocationDetailScreen
 import com.example.composelocationweather.feature_location.presentation.LocationScreen
 import com.example.composelocationweather.feature_location.presentation.LocationViewModel
 import com.example.composelocationweather.feature_location.presentation.MapsScreen
+import com.example.composelocationweather.feature_location.presentation.PlacesViewModel
 import com.example.composelocationweather.feature_weather.presentation.GetWeatherViewModel
 import com.example.composelocationweather.feature_weather.presentation.WeatherInfoScreen
 import com.example.composelocationweather.location.AppLocationProvider
@@ -85,6 +88,7 @@ class MainActivity : ComponentActivity() {
     fun MainApp() {
         val getWeatherViewModel: GetWeatherViewModel = hiltViewModel()
         val locationViewModel: LocationViewModel = hiltViewModel()
+            val placesViewModel: PlacesViewModel = hiltViewModel()
 
         val utils = Utils(this.applicationContext)
         val locationPermissions = arrayOf(
@@ -187,20 +191,32 @@ class MainActivity : ComponentActivity() {
 
                                 composable<Screens.LocationScreen> {
                                     LocationScreen(
-                                        locationListState = locationViewModel.locationStateFlow.collectAsStateWithLifecycle()
-                                    ) { location ->
-                                        locationViewModel.deleteUserLocation(location)
-                                    }
-                                }
+                                        navController = navController,
+                                                locationListState = locationViewModel.locationStateFlow.collectAsStateWithLifecycle()
+                                            ) { location ->
+                                                locationViewModel.deleteUserLocation(location)
+                                            }
+                                        }
 
-                                composable<Screens.MapScreen> {
-                                    MapsScreen(
-                                        locationListState = locationViewModel.locationStateFlow.collectAsStateWithLifecycle(),
-                                        currentLocation = appLocationProvider.currentLocation
-                                    )
-                                }
-                            }
-                        } else {
+                                        composable<Screens.MapScreen> {
+                                            MapsScreen(
+                                                locationListState = locationViewModel.locationStateFlow.collectAsStateWithLifecycle(),
+                                                currentLocation = appLocationProvider.currentLocation
+                                            )
+                                        }
+
+                                        composable<Screens.LocationDetail> {
+                                            val args = it.toRoute<Screens.LocationDetail>()
+                                            LocationDetailScreen(
+                                                placesState = placesViewModel.placesState,
+                                                userLocation = args.userLocation,
+                                                name = args.name
+                                            ) { location ->
+                                                placesViewModel.getLocationInformation(location)
+                                            }
+                                        }
+                                    }
+                                } else {
 
                             Text(
                                 modifier = Modifier
