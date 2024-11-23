@@ -13,10 +13,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -37,160 +41,254 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.example.composelocationweather.feature_weather.presentation.weather.GetWeatherViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import com.example.composelocationweather.feature_location.presentation.LocationDetailScreen
+import com.example.composelocationweather.feature_location.presentation.LocationScreen
+import com.example.composelocationweather.feature_location.presentation.LocationViewModel
+import com.example.composelocationweather.feature_location.presentation.MapsScreen
+import com.example.composelocationweather.feature_location.presentation.PlacesViewModel
+import com.example.composelocationweather.feature_weather.presentation.GetWeatherViewModel
+import com.example.composelocationweather.feature_weather.presentation.WeatherInfoScreen
+import com.example.composelocationweather.location.AppLocationProvider
 import com.example.composelocationweather.ui.theme.ComposeLocationWeatherTheme
+import com.example.composelocationweather.util.Screens
+import com.example.composelocationweather.util.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var appLocationProvider: AppLocationProvider
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val getWeatherViewModel: GetWeatherViewModel = hiltViewModel()
-            val locationPermissions = arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
-
-            val locationPermissionsGranted by remember {
-                mutableStateOf(areLocationPermissionsAlreadyGranted())
-            }
-            var shouldDirectUserToApplicationSettings by remember {
-                mutableStateOf(false)
-            }
-            var shouldShowPermissionRationale by remember {
-                mutableStateOf(
-                    shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)
-                )
-            }
-
-            var currentPermissionsStatus by remember {
-                mutableStateOf(
-                    decideCurrentPermissionStatus(
-                        locationPermissionsGranted,
-                        shouldShowPermissionRationale
-                    )
-                )
-            }
-
-
-            val permissionLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.RequestMultiplePermissions(),
-
-                ) { permissions ->
-                val permissionsGranted = permissions.values.reduce { acc, isPermissionGranted ->
-                    acc && isPermissionGranted
-                }
-                if (!permissionsGranted) {
-                    shouldShowPermissionRationale =
-                        shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)
-                }
-                shouldDirectUserToApplicationSettings =
-                    !shouldShowPermissionRationale && !locationPermissionsGranted
-                currentPermissionsStatus = decideCurrentPermissionStatus(
-                    locationPermissionsGranted,
-                    shouldShowPermissionRationale
-                )
-            }
-
-            val lifecycleOwner = LocalLifecycleOwner.current
-            DisposableEffect(key1 = lifecycleOwner, effect = {
-                val observer = LifecycleEventObserver { _, event ->
-                    if (event == Lifecycle.Event.ON_START &&
-                        !locationPermissionsGranted &&
-                        !shouldShowPermissionRationale
-                    ) {
-                        permissionLauncher.launch(locationPermissions)
-                    }
-                }
-                lifecycleOwner.lifecycle.addObserver(observer)
-                onDispose {
-                    lifecycleOwner.lifecycle.removeObserver(observer)
-                }
-            }
-            )
-
-            val scope = rememberCoroutineScope()
-            val snackbarHostState = remember { SnackbarHostState() }
 
             ComposeLocationWeatherTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Scaffold(
-                        snackbarHost = {
-                            SnackbarHost(hostState = snackbarHostState)
-                        },
-                        modifier = Modifier.fillMaxSize()
-                    ) { innerPadding ->
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
+                MainApp()
+            }
+        }
+    }
 
-                            if (areLocationPermissionsAlreadyGranted()) {
-                                val currentWeatherState = getWeatherViewModel.currentWeatherState.value
-                                Text(
-                                    modifier = Modifier
-                                        .padding(innerPadding)
-                                        .fillMaxWidth(),
-                                    text = "Current Weather: ${currentWeatherState.currentWeatherData.main.temp}C",
-                                    textAlign = TextAlign.Center
-                                )
-                                Spacer(modifier = Modifier.padding(20.dp))
-                            }
+    @Composable
+    fun MainApp() {
+        val getWeatherViewModel: GetWeatherViewModel = hiltViewModel()
+        val locationViewModel: LocationViewModel = hiltViewModel()
+            val placesViewModel: PlacesViewModel = hiltViewModel()
+
+        val utils = Utils(this.applicationContext)
+        val locationPermissions = arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+
+        var shouldDirectUserToApplicationSettings by remember {
+            mutableStateOf(false)
+        }
+        var shouldShowPermissionRationale by remember {
+            mutableStateOf(
+                shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)
+            )
+        }
+
+        val scope = rememberCoroutineScope()
+        val snackbarHostState = remember { SnackbarHostState() }
+        var arePermissionGranted by remember {
+            mutableStateOf(
+                areLocationPermissionsAlreadyGranted()
+            )
+        }
+
+        val permissionLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestMultiplePermissions(),
+
+            ) { permissions ->
+            val permissionsGranted = permissions.values.reduce { acc, isPermissionGranted ->
+                acc && isPermissionGranted
+            }
+            if (!permissionsGranted) {
+                shouldShowPermissionRationale =
+                    shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)
+            }
+            shouldDirectUserToApplicationSettings =
+                !shouldShowPermissionRationale && !areLocationPermissionsAlreadyGranted()
+
+            arePermissionGranted = areLocationPermissionsAlreadyGranted()
+            if (areLocationPermissionsAlreadyGranted()) {
+                if (appLocationProvider.isLocationEnabled()) {
+                    getWeatherViewModel.getCurrentWeather()
+                } else {
+                    scope.launch {
+                        snackbarHostState.showSnackbar("Please enable location to continue")
+                    }
+                    gotoLocationSetting()
+                }
+            }
+        }
+
+        val lifecycleOwner = LocalLifecycleOwner.current
+        DisposableEffect(key1 = lifecycleOwner, effect = {
+            val observer = LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_START &&
+                    !areLocationPermissionsAlreadyGranted() &&
+                    !shouldShowPermissionRationale
+                ) {
+                    permissionLauncher.launch(locationPermissions)
+                }
+            }
+            lifecycleOwner.lifecycle.addObserver(observer)
+            onDispose {
+                lifecycleOwner.lifecycle.removeObserver(observer)
+            }
+        }
+        )
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            Scaffold(
+                snackbarHost = {
+                    SnackbarHost(hostState = snackbarHostState)
+                },
+                modifier = Modifier.fillMaxSize()
+            ) { innerPadding ->
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (arePermissionGranted) {
+                        if (appLocationProvider.isLocationEnabled()) {
+                            val navController = rememberNavController()
+                            NavHost(
+                                navController = navController,
+                                startDestination = Screens.WeatherScreen
+                            ) {
+                                composable<Screens.WeatherScreen> {
+                                    WeatherInfoScreen(
+                                        navController,
+                                        getWeatherViewModel.currentWeatherState,
+                                        getWeatherViewModel.forecastState,
+                                        utils.isDeviceOnline(),
+                                    ) { location ->
+                                        locationViewModel.saveUserLocation(location)
+                                    }
+                                }
+
+                                composable<Screens.LocationScreen> {
+                                    LocationScreen(
+                                        navController = navController,
+                                                locationListState = locationViewModel.locationStateFlow.collectAsStateWithLifecycle()
+                                            ) { location ->
+                                                locationViewModel.deleteUserLocation(location)
+                                            }
+                                        }
+
+                                        composable<Screens.MapScreen> {
+                                            MapsScreen(
+                                                locationListState = locationViewModel.locationStateFlow.collectAsStateWithLifecycle(),
+                                                currentLocation = appLocationProvider.currentLocation
+                                            )
+                                        }
+
+                                        composable<Screens.LocationDetail> {
+                                            val args = it.toRoute<Screens.LocationDetail>()
+                                            LocationDetailScreen(
+                                                placesState = placesViewModel.placesState,
+                                                userLocation = args.userLocation,
+                                                name = args.name
+                                            ) { location ->
+                                                placesViewModel.getLocationInformation(location)
+                                            }
+                                        }
+                                    }
+                                } else {
 
                             Text(
                                 modifier = Modifier
                                     .padding(innerPadding)
                                     .fillMaxWidth(),
-                                text = "Current Permission Status: $currentPermissionsStatus",
+                                text = "Please enable location and click refresh",
                                 textAlign = TextAlign.Center,
                                 fontWeight = FontWeight.Bold
                             )
-                        }
-                        if (shouldShowPermissionRationale) {
-                            LaunchedEffect(Unit) {
-                                scope.launch {
-                                    val userAction = snackbarHostState.showSnackbar(
-                                        message = "Please authorize location permissions",
-                                        actionLabel = "Approve",
-                                        duration = SnackbarDuration.Indefinite,
-                                        withDismissAction = true
-                                    )
-                                    when (userAction) {
-                                        SnackbarResult.ActionPerformed -> {
-                                            shouldShowPermissionRationale = false
-                                            permissionLauncher.launch(locationPermissions)
-                                        }
 
-                                        SnackbarResult.Dismissed -> {
-                                            shouldShowPermissionRationale = false
+                            IconButton(
+                                onClick = {
+                                    if (appLocationProvider.isLocationEnabled()) {
+                                        getWeatherViewModel.getCurrentWeather()
+                                    } else {
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar("Please enable location to continue")
                                         }
                                     }
                                 }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Refresh,
+                                    contentDescription = "Get current weather",
+                                    modifier = Modifier.size(48.dp)
+                                )
                             }
                         }
+                    } else {
+                        Text(
+                            modifier = Modifier
+                                .padding(innerPadding)
+                                .fillMaxWidth(),
+                            text = "Location permission required",
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+                if (shouldShowPermissionRationale) {
+                    LaunchedEffect(Unit) {
+                        scope.launch {
+                            val userAction = snackbarHostState.showSnackbar(
+                                message = "Please authorize location permissions",
+                                actionLabel = "Approve",
+                                duration = SnackbarDuration.Indefinite,
+                                withDismissAction = true
+                            )
+                            when (userAction) {
+                                SnackbarResult.ActionPerformed -> {
+                                    shouldShowPermissionRationale = false
+                                    permissionLauncher.launch(locationPermissions)
+                                }
 
-                        if (shouldDirectUserToApplicationSettings) {
-                            openApplicationSettings()
+                                SnackbarResult.Dismissed -> {
+                                    shouldShowPermissionRationale = false
+                                }
+                            }
                         }
                     }
+                }
 
+                if (shouldDirectUserToApplicationSettings) {
+                    openApplicationSettings()
                 }
             }
+
         }
+    }
+
+    private fun gotoLocationSetting() {
+        startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
     }
 
     private fun areLocationPermissionsAlreadyGranted(): Boolean {
@@ -211,31 +309,5 @@ class MainActivity : ComponentActivity() {
         ).also {
             startActivity(it)
         }
-    }
-
-    private fun decideCurrentPermissionStatus(
-        locationPermissionsGranted: Boolean,
-        shouldShowPermissionRationale: Boolean
-    ): String {
-        return if (locationPermissionsGranted) "Granted"
-        else if (shouldShowPermissionRationale) "Rejected"
-        else "Denied"
-    }
-}
-
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ComposeLocationWeatherTheme {
-        Greeting("Android")
     }
 }

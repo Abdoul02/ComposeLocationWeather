@@ -1,7 +1,3 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-import java.io.FileInputStream
-import java.util.Properties
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -9,6 +5,7 @@ plugins {
     alias(libs.plugins.org.jetbrains.kotlin.kapt)
     //alias(libs.plugins.ksp)
     alias(libs.plugins.dagger.hilt.android)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
 android {
@@ -30,7 +27,11 @@ android {
         val weatherApiKey = System.getenv("WEATHER_API_KEY") ?: ""
         buildConfigField("String", "WEATHER_API_KEY", "\"${weatherApiKey}\"")
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        val placesApiKey = System.getenv("PLACES_API_KEY") ?: ""
+        buildConfigField("String", "PLACES_API_KEY", "\"${placesApiKey}\"")
+
+        //testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.example.composelocationweather.HiltTestRunner"
     }
 
     buildTypes {
@@ -66,6 +67,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.kotlinx.serialization.json)
 
     //Network
     implementation(libs.okhttp)
@@ -88,6 +90,11 @@ dependencies {
 
     //Location
     implementation(libs.location)
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.maps)
+
+    //Coil
+    implementation(libs.coil)
 
     //hilt
     implementation(libs.hilt.navigation)
@@ -106,6 +113,9 @@ dependencies {
 
 
 
+    androidTestImplementation(libs.androidx.core.test)
+    androidTestImplementation(libs.hilt.android.test)
+    androidTestImplementation(libs.google.truth)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

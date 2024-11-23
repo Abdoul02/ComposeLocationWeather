@@ -4,26 +4,25 @@ import com.example.composelocationweather.feature_weather.domain.model.CurrentWe
 import com.example.composelocationweather.feature_weather.domain.model.WeatherRequestData
 import com.example.composelocationweather.feature_weather.domain.model.currentWeather.CurrentWeatherModel
 import com.example.composelocationweather.feature_weather.domain.repository.WeatherRepository
+import com.example.composelocationweather.util.Resource
 import com.example.composelocationweather.util.Utils
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.Mockito.mock
 
 class GetCurrentWeatherShould {
 
     private val repository: WeatherRepository = mock()
-
-    //val context  =  Mockito.mock(Context::class.java)
-    //private val util: Utils = Mockito.spy(Utils(context))
     private val util: Utils = mock()
     private val weatherRequestData: WeatherRequestData = mock()
 
 
     @Test
-    fun getLocalWeatherDataWhenDeviceIsOffline() = runTest {
+    fun callGetLocalWeatherDataWhenDeviceIsOffline() = runTest {
         whenever(util.isDeviceOnline()).thenReturn(false)
         whenever(repository.getLocalWeatherData()).thenReturn(CurrentWeatherData(CurrentWeatherModel()))
         val useCase = GetCurrentWeather(repository, util)
@@ -33,7 +32,16 @@ class GetCurrentWeatherShould {
     }
 
     @Test
-    fun getNetworkWeatherDataWhenDeviceIsOnline() = runTest {
+    fun returnCurrentWeatherModelResource() = runTest {
+        whenever(repository.getLocalWeatherData()).thenReturn(CurrentWeatherData(CurrentWeatherModel()))
+        val useCase = GetCurrentWeather(repository, util)
+        val response = useCase.invoke(weatherRequestData)
+
+        assertEquals(response, Resource.success(CurrentWeatherModel()))
+    }
+
+    @Test
+    fun callGetNetworkWeatherDataWhenDeviceIsOnline() = runTest {
         whenever(util.isDeviceOnline()).thenReturn(true)
         val useCase = GetCurrentWeather(repository, util)
         useCase.invoke(weatherRequestData)

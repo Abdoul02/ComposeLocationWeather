@@ -2,10 +2,19 @@ package com.example.composelocationweather.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.composelocationweather.feature_weather.data.local.LocationWeatherDB
+import com.example.composelocationweather.api.RetrofitAPI
+import com.example.composelocationweather.database.LocationWeatherDB
+import com.example.composelocationweather.feature_location.data.LocationDao
+import com.example.composelocationweather.feature_location.data.repository.LocationRepositoryImpl
+import com.example.composelocationweather.feature_location.domain.repository.LocationRepository
+import com.example.composelocationweather.feature_location.domain.use_case.DeleteLocation
+import com.example.composelocationweather.feature_location.domain.use_case.GetLocationById
+import com.example.composelocationweather.feature_location.domain.use_case.GetLocationInformation
+import com.example.composelocationweather.feature_location.domain.use_case.GetLocations
+import com.example.composelocationweather.feature_location.domain.use_case.LocationUseCases
+import com.example.composelocationweather.feature_location.domain.use_case.SaveLocation
 import com.example.composelocationweather.feature_weather.data.local.dao.CurrentWeatherDao
 import com.example.composelocationweather.feature_weather.data.local.dao.ForecastDataDao
-import com.example.composelocationweather.feature_weather.data.remote.RetrofitAPI
 import com.example.composelocationweather.feature_weather.data.repository.WeatherRepositoryImpl
 import com.example.composelocationweather.feature_weather.domain.repository.WeatherRepository
 import com.example.composelocationweather.feature_weather.domain.use_case.GetCurrentWeather
@@ -34,7 +43,9 @@ object AppModule {
     @Provides
     fun injectRoomDatabase(
         @ApplicationContext context: Context,
-    ) = Room.databaseBuilder(context, LocationWeatherDB::class.java, "LocationWeatherDB").build()
+    ) = Room.databaseBuilder(context, LocationWeatherDB::class.java, "LocationWeatherDB")
+        .fallbackToDestructiveMigrationFrom()
+        .build()
 
     @Singleton
     @Provides
@@ -50,6 +61,12 @@ object AppModule {
 
     @Singleton
     @Provides
+    fun injectLocationDao(
+        database: LocationWeatherDB
+    ) = database.locationDao()
+
+    @Singleton
+    @Provides
     fun provideWeatherUseCase(repository: WeatherRepository, utils: Utils): WeatherUseCase {
         return WeatherUseCase(
             getCurrentWeather = GetCurrentWeather(repository, utils),
@@ -59,11 +76,30 @@ object AppModule {
 
     @Singleton
     @Provides
+    fun provideLocationUseCases(repository: LocationRepository) = LocationUseCases(
+        saveLocation = SaveLocation(repository),
+        getLocations = GetLocations(repository),
+        deleteLocation = DeleteLocation(repository),
+        getLocationById = GetLocationById(repository),
+        getLocationInformation = GetLocationInformation(repository)
+    )
+
+
+    @Singleton
+    @Provides
     fun provideWeatherRepository(
         currentWeatherDao: CurrentWeatherDao,
         forecastDataDao: ForecastDataDao,
         retrofitApi: RetrofitAPI
     ) = WeatherRepositoryImpl(currentWeatherDao, forecastDataDao, retrofitApi) as WeatherRepository
+
+    @Singleton
+    @Provides
+    fun provideLocationRepository(
+        locationDao: LocationDao,
+        retrofitApi: RetrofitAPI
+    ) = LocationRepositoryImpl(locationDao, retrofitApi) as LocationRepository
+
 
     @Singleton
     @Provides

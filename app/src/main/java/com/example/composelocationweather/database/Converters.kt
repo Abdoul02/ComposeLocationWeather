@@ -1,4 +1,4 @@
-package com.example.composelocationweather.feature_weather.data.local
+package com.example.composelocationweather.database
 
 import androidx.room.TypeConverter
 import com.example.composelocationweather.feature_weather.domain.model.currentWeather.*

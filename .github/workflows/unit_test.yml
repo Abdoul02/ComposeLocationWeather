@@ -3,7 +3,7 @@ name: Unit Test
 on:
   pull_request:
     branches:
-      - main
+      - develop
 
 jobs:
   unit-tests:
@@ -11,6 +11,7 @@ jobs:
 
     env:
       WEATHER_API_KEY: ${{secrets.WEATHER_API_KEY}}
+      PLACES_API_KEY: ${{secrets.PLACES_API_KEY}}
 
     steps:
       - name: Checkout the code

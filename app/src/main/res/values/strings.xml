@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">ComposeLocationWeather</string>
+    <string name="current_temp">%1$s %2$s</string>
+    <string name="google_maps_key">AIzaSyBPSS61x4FBwCxBMM9OUrUuOnAl365bOcY</string>
 </resources>
