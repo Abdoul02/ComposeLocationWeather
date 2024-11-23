@@ -1,6 +1,5 @@
 package com.example.composelocationweather.feature_weather.presentation
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import com.example.composelocationweather.R
@@ -41,6 +41,7 @@ import com.example.composelocationweather.ui.theme.Cloudy
 import com.example.composelocationweather.ui.theme.Rainy
 import com.example.composelocationweather.ui.theme.Sunny
 import com.example.composelocationweather.util.Screens
+import com.example.composelocationweather.util.TestTags
 import kotlinx.coroutines.launch
 
 @Composable
@@ -64,7 +65,10 @@ fun WeatherInfoScreen(
     ) {
         Scaffold(
             snackbarHost = {
-                SnackbarHost(hostState = snackbarHostState)
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    modifier = Modifier.testTag(TestTags.WEATHER_SCREEN_SNACK_BAR)
+                )
             },
             floatingActionButton = {
                 CustomFloatingActionButton(
@@ -140,7 +144,11 @@ fun WeatherInfoScreen(
                         IndeterminateCircularIndicator(isLoading = forecastData.isLoading)
                         Column {
                             forecastData.forecastDetails?.let { forecast ->
-                                LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                                LazyColumn(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .testTag(TestTags.FORECAST_LIST)
+                                ) {
                                     items(forecast) { forecastDetail ->
                                         ForecastItem(forecastDetail = forecastDetail)
                                     }

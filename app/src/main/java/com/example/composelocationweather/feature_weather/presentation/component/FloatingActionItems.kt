@@ -13,10 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.composelocationweather.R
+import com.example.composelocationweather.util.TestTags
 
 @Composable
 fun FloatingActionItems(
@@ -28,13 +30,20 @@ fun FloatingActionItems(
     Column(
         verticalArrangement = Arrangement.spacedBy(30.dp)
     ) {
-        ActionItem(icon = R.drawable.ic_map, title = "Go to Map", onClick = onGotoMap)
         ActionItem(
+            modifier = Modifier.testTag(TestTags.NAVIGATE_TO_MAP_TEXT),
+            icon = R.drawable.ic_map,
+            title = "Go to Map",
+            onClick = onGotoMap
+        )
+        ActionItem(
+            modifier = Modifier.testTag(TestTags.NAVIGATE_TO_LOCATIONS_TEXT),
             icon = R.drawable.ic_current_location,
             title = "Go to Locations",
             onClick = onGotoLocations
         )
         ActionItem(
+            modifier = Modifier.testTag(TestTags.SAVE_LOCATION_TEXT),
             icon = R.drawable.ic_favorite,
             title = "Add to favorite",
             onClick = onSaveLocation
