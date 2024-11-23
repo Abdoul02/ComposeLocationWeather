@@ -1,6 +1,5 @@
 package com.example.composelocationweather.feature_location.presentation
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -11,7 +10,6 @@ import com.example.composelocationweather.feature_location.presentation.state.Lo
 import com.example.composelocationweather.feature_location.presentation.state.LocationState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -52,9 +50,16 @@ class LocationViewModel @Inject constructor(
     }
 
     fun getLocationById(id: Int) {
+        viewModelScope.launch {
+            locationUseCases.getLocationById(id)?.also { userLocation ->
+                _locationState.value = locationState.value.copy(
+                    userLocation = userLocation
+                )
+            }
+        }
     }
 
-    fun getAllSavedLocation() {
+    private fun getAllSavedLocation() {
         viewModelScope.launch(Dispatchers.IO) {
             locationUseCases.getLocations()
                 .onEach { userLocations ->
