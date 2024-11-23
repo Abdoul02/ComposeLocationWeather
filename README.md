@@ -12,6 +12,7 @@ The user can also see all the saved Location on google map.
 - 🔍 **Data Storage**: Store and retrieve weather data efficiently with Room Database.
 - 💡 **Architecture**: MVVM and clean Architecture.
 - 🗺️ **Compose Google Maps**: Google map using Jetpack compose.
+- 🔍 **Google Places**: Show nearest point of interest around a location
 
 ---
 
@@ -31,18 +32,20 @@ The user can also see all the saved Location on google map.
 
 ---
 
----
 ## 🛡️ CI/CD with GitHub Workflows
+
 The project leverages GitHub Actions for:
 
-🚨 Running Unit Tests on every pull request
-    - Workflow triggers on pull_request targeting dev branch.
-📦 Generating debug build APK 
-    - Workflow triggers on merge_request targeting main branch.
+- 🚨 **Running Unit Tests on every pull request**
+ Workflow triggers on pull_request targeting dev branch.
+- 📦 **Generating debug build APK**
+Workflow triggers on merge_request targeting main branch.
+
 ## ‼️ Please note the following:
 
-OpenWeatherMap Key should stored in your bash_profile as: `WEATHER_API_KEY`.
-Alternatively you can just paste it in your local.properties
+OpenWeatherMap Key should be stored in your bash_profile as: `WEATHER_API_KEY`.
+same goes for `PLACES_API_KEY`
+Alternatively you can just paste them in your local.properties
 and uncomment the following code under build.gradle.kts
 
     /*val properties = Properties().apply { load(FileInputStream(File(rootProject.rootDir, "local.properties"))) }
