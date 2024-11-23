@@ -47,6 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -186,7 +187,7 @@ class MainActivity : ComponentActivity() {
 
                                 composable<Screens.LocationScreen> {
                                     LocationScreen(
-                                        locationListState = locationViewModel.locationListState
+                                        locationListState = locationViewModel.locationStateFlow.collectAsStateWithLifecycle()
                                     ) { location ->
                                         locationViewModel.deleteUserLocation(location)
                                     }
@@ -194,7 +195,7 @@ class MainActivity : ComponentActivity() {
 
                                 composable<Screens.MapScreen> {
                                     MapsScreen(
-                                        locationListState = locationViewModel.locationListState,
+                                        locationListState = locationViewModel.locationStateFlow.collectAsStateWithLifecycle(),
                                         currentLocation = appLocationProvider.currentLocation
                                     )
                                 }
