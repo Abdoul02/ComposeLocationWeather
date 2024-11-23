@@ -28,9 +28,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.composelocationweather.ui.theme.Indingo
+import com.example.composelocationweather.util.TestTags
 
 @Composable
 fun CustomFloatingActionButton(
@@ -92,7 +94,8 @@ fun CustomFloatingActionButton(
             },
             modifier = Modifier
                 .width(expandedFabWidth)
-                .height(expandedFabHeight),
+                .height(expandedFabHeight)
+                .testTag(TestTags.LOCATION_NAV_FAB),
             shape = RoundedCornerShape(18.dp),
             containerColor = Indingo
 
