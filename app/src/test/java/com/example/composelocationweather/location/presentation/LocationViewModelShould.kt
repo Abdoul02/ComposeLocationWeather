@@ -25,7 +25,6 @@ class LocationViewModelShould : BaseUnitTest() {
     private val saveLocation: SaveLocation = mock()
     private val deleteLocation: DeleteLocation = mock()
     private val viewModel = LocationViewModel(locationUseCases)
-    private val getLocations: GetLocations = mock()
 
     @Test
     fun callSaveLocationFromLocationUseCases() = runTest(UnconfinedTestDispatcher()) {
@@ -42,12 +41,4 @@ class LocationViewModelShould : BaseUnitTest() {
 
         verify(locationUseCases.deleteLocation, times(1)).invoke(fakeUserLocation)
     }
-
-/*    @Test
-    fun callGetLocationsFromLocationUseCases() = runTest(UnconfinedTestDispatcher()) {
-        whenever(locationUseCases.getLocations).thenReturn(getLocations)
-        viewModel.getAllSavedLocation()
-
-        verify(locationUseCases.getLocations, times(1)).invoke()
-    }*/
 }
