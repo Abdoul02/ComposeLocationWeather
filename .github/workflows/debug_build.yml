@@ -3,6 +3,7 @@ name: Build-debug-apk
 env:
   main_project_module: app
   WEATHER_API_KEY: ${{secrets.WEATHER_API_KEY}}
+  PLACES_API_KEY: ${{secrets.PLACES_API_KEY}}
   playstore_name: WeatherLocationApp
 
 on:
