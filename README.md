@@ -44,8 +44,8 @@ Workflow triggers on merge_request targeting main branch.
 ## ‼️ Please note the following:
 
 OpenWeatherMap Key should be stored in your bash_profile as: `WEATHER_API_KEY`.
-same goes for 
-Alternatively you can just paste it in your local.properties
+same goes for `PLACES_API_KEY`
+Alternatively you can just paste them in your local.properties
 and uncomment the following code under build.gradle.kts
 
     /*val properties = Properties().apply { load(FileInputStream(File(rootProject.rootDir, "local.properties"))) }
