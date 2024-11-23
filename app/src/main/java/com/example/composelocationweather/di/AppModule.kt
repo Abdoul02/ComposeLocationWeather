@@ -2,18 +2,19 @@ package com.example.composelocationweather.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.composelocationweather.api.RetrofitAPI
 import com.example.composelocationweather.database.LocationWeatherDB
 import com.example.composelocationweather.feature_location.data.LocationDao
 import com.example.composelocationweather.feature_location.data.repository.LocationRepositoryImpl
 import com.example.composelocationweather.feature_location.domain.repository.LocationRepository
 import com.example.composelocationweather.feature_location.domain.use_case.DeleteLocation
 import com.example.composelocationweather.feature_location.domain.use_case.GetLocationById
+import com.example.composelocationweather.feature_location.domain.use_case.GetLocationInformation
 import com.example.composelocationweather.feature_location.domain.use_case.GetLocations
 import com.example.composelocationweather.feature_location.domain.use_case.LocationUseCases
 import com.example.composelocationweather.feature_location.domain.use_case.SaveLocation
 import com.example.composelocationweather.feature_weather.data.local.dao.CurrentWeatherDao
 import com.example.composelocationweather.feature_weather.data.local.dao.ForecastDataDao
-import com.example.composelocationweather.feature_weather.data.remote.RetrofitAPI
 import com.example.composelocationweather.feature_weather.data.repository.WeatherRepositoryImpl
 import com.example.composelocationweather.feature_weather.domain.repository.WeatherRepository
 import com.example.composelocationweather.feature_weather.domain.use_case.GetCurrentWeather
@@ -79,7 +80,8 @@ object AppModule {
         saveLocation = SaveLocation(repository),
         getLocations = GetLocations(repository),
         deleteLocation = DeleteLocation(repository),
-        getLocationById = GetLocationById(repository)
+        getLocationById = GetLocationById(repository),
+        getLocationInformation = GetLocationInformation(repository)
     )
 
 
@@ -94,8 +96,9 @@ object AppModule {
     @Singleton
     @Provides
     fun provideLocationRepository(
-        locationDao: LocationDao
-    ) = LocationRepositoryImpl(locationDao) as LocationRepository
+        locationDao: LocationDao,
+        retrofitApi: RetrofitAPI
+    ) = LocationRepositoryImpl(locationDao, retrofitApi) as LocationRepository
 
 
     @Singleton

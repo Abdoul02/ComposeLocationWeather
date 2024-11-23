@@ -1,5 +1,6 @@
 package com.example.composelocationweather.location.data.repository
 
+import com.example.composelocationweather.api.RetrofitAPI
 import com.example.composelocationweather.feature_location.data.LocationDao
 import com.example.composelocationweather.feature_location.data.repository.LocationRepositoryImpl
 import com.example.composelocationweather.feature_location.domain.model.UserLocation
@@ -12,7 +13,8 @@ import org.mockito.Mockito.mock
 class LocationRepositoryShould {
 
     private val locationDao: LocationDao = mock()
-    private val repository = LocationRepositoryImpl(locationDao)
+    private val retrofitApi: RetrofitAPI = mock()
+    private val repository = LocationRepositoryImpl(locationDao, retrofitApi)
     private val location: UserLocation = mock()
 
     @Test

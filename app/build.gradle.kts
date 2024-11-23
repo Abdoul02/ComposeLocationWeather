@@ -1,7 +1,3 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-import java.io.FileInputStream
-import java.util.Properties
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -30,6 +26,9 @@ android {
         //Replace weatherApiKey with your own WEATHER_API_KEY
         val weatherApiKey = System.getenv("WEATHER_API_KEY") ?: ""
         buildConfigField("String", "WEATHER_API_KEY", "\"${weatherApiKey}\"")
+
+        val placesApiKey = System.getenv("PLACES_API_KEY") ?: ""
+        buildConfigField("String", "PLACES_API_KEY", "\"${placesApiKey}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -92,6 +91,9 @@ dependencies {
     implementation(libs.location)
     implementation(libs.maps.compose)
     implementation(libs.play.services.maps)
+
+    //Coil
+    implementation(libs.coil)
 
     //hilt
     implementation(libs.hilt.navigation)

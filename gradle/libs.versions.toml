@@ -24,7 +24,7 @@ location = "21.3.0"
 maps-compose = "2.9.0"
 play-services-maps = "19.0.0"
 
-
+coil = "2.4.0"
 #Coroutines
 coroutines = "1.7.3"
 
@@ -89,6 +89,9 @@ coroutine-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android
 location = { module = "com.google.android.gms:play-services-location", version.ref = "location" }
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "maps-compose" }
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "play-services-maps" }
+
+#Coil
+coil = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 
 #Hilt
 hilt-navigation = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt_navigation" }
