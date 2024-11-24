@@ -36,9 +36,12 @@ The user can also see all the saved Location on google map.
 The project leverages GitHub Actions for:
 
 🚨 Running Unit Tests on every pull request
-    - Workflow triggers on pull_request targeting dev branch.
+
+    * Workflow triggers on pull_request targeting dev branch.
 📦 Generating debug build APK 
-    - Workflow triggers on merge_request targeting main branch.
+
+    * Workflow triggers on merge_request targeting main branch.
+    
 ## ‼️ Please note the following:
 
 OpenWeatherMap Key should stored in your bash_profile as: `WEATHER_API_KEY`.
